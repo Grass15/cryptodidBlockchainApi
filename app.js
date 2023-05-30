@@ -16,7 +16,6 @@ let revocationsTree = new RevocationsMerkleTree();
 
 app.post('/post/vc', async (req, res) => {
     try {
-        console.log(req.body)
         const { signature, revNonce, version } = req.body;
         // TODO: Validate signature, revNonce, and version here
 
@@ -161,15 +160,16 @@ app.get('/isvcinRevocationsMerkleTree', (req, res) => {
 
     if (revocationsTree.verifyProof(proof, hash)) {
         res.status(200).json({
-            message: 'VC is revoked',
+            isRevoked: true,
             proof
         });
     } else {
-        res.status(400).json({ 
-            message: 'VC isnt revoked'
+        res.status(200).json({ 
+            isRevoked: false
         });
     }
 });
+
 
 
 app.get('/rootsTree/root', (req, res) => {
