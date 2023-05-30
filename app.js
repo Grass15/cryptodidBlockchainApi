@@ -13,7 +13,6 @@ let vcTree = new VCMerkleTree();
 let rootsTree = new RootsMerkleTree();
 let revocationsTree = new RevocationsMerkleTree();
 
-
 app.post('/post/vc', async (req, res) => {
     try {
         const { signature, revNonce, version } = req.body;
