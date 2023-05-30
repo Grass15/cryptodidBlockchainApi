@@ -7,6 +7,7 @@ const blockchain = require('./blockchain.js');
 
 const app = express();
 app.use(express.json());
+const port = 4000;
 
 let vcTree = new VCMerkleTree();
 let rootsTree = new RootsMerkleTree();
@@ -227,6 +228,6 @@ async function signAndSendTransaction(state) {
     }
 }
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.listen(process.env.PORT || port, () => {
+    console.log('Server is running on port 4000');
 });
