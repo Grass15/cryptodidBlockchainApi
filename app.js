@@ -193,8 +193,7 @@ app.get('/rootsTree/root', (req, res) => {
 
 app.get('/policy', (req, res) => {
     const root = rootsTree.getRoot();
-    res.status(200).json("Cryptodid data privacy. \nThis app collect your email your name and firstname.\n \
-     We resect your privacy and will not share or use your data without your consentment");
+    res.status(200).json("Cryptodid data privacy: This app collect your email your name and firstname. We respect your privacy and will not share or use your data without your consentment");
 });
 
 app.get('/revocationsTree/leaves', (req, res) => {
