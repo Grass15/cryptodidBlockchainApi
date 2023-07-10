@@ -5,8 +5,8 @@ const { MerkleTree } = require('merkletreejs');
 
 
 class VCMerkleTree extends BasicMerkleTree {
-  constructor() {
-    super();
+  constructor(db) {
+    super(db, 'vcTree');
   }
 
   getProofForLeaf(vcId) {

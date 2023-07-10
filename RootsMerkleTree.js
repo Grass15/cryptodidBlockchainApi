@@ -4,8 +4,8 @@ const SHA256 = require('crypto-js/sha256');
 const { MerkleTree } = require('merkletreejs');
 
 class RootsMerkleTree extends BasicMerkleTree {
-  constructor() {
-    super();
+  constructor(db) {
+    super(db, 'rootsTree');
   }
 
   // If needed, add specific methods for Roots Merkle tree

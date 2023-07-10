@@ -4,14 +4,29 @@ const RootsMerkleTree = require('./RootsMerkleTree');
 const RevocationsMerkleTree = require('./RevocationsMerkleTree');
 const SHA256 = require('crypto-js/sha256');
 const blockchain = require('./blockchain.js');
-
+const sqlite3 = require('sqlite3').verbose();
 const app = express();
 app.use(express.json());
-const port = 4000;
 
-let vcTree = new VCMerkleTree();
-let rootsTree = new RootsMerkleTree();
-let revocationsTree = new RevocationsMerkleTree();
+// SQLite database initialization
+const db = new sqlite3.Database('./mydb.db', (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Connected to the SQLite database.');
+  });
+
+  db.serialize(() => {
+    db.run("CREATE TABLE IF NOT EXISTS vcTree (timestamp INTEGER, leaf TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS rootsTree (timestamp INTEGER, leaf TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS revocationsTree (timestamp INTEGER, leaf TEXT)");
+});
+
+
+let vcTree = new VCMerkleTree(db);
+let rootsTree = new RootsMerkleTree(db);
+let revocationsTree = new RevocationsMerkleTree(db);
+
 
 app.post('/post/vc', async (req, res) => {
     try {
@@ -176,6 +191,12 @@ app.get('/rootsTree/root', (req, res) => {
     res.status(200).json(root);
 });
 
+app.get('/policy', (req, res) => {
+    const root = rootsTree.getRoot();
+    res.status(200).json("Cryptodid data privacy. \nThis app collect your email your name and firstname.\n \
+     We resect your privacy and will not share or use your data without your consentment");
+});
+
 app.get('/revocationsTree/leaves', (req, res) => {
     const leaves = revocationsTree.getLeaves();
     res.status(200).json(leaves);
@@ -227,6 +248,13 @@ async function signAndSendTransaction(state) {
     }
 }
 
-app.listen(process.env.PORT || port, () => {
-    console.log('Server is running on port 4000');
+app.listen(process.env.PORT || 4000, () => {
+    console.log('Server is loading data from database...');
+  
+    // Initialize each tree
+    vcTree.initFromDB();
+    rootsTree.initFromDB();
+    revocationsTree.initFromDB();
+
+    console.log('Server started on port 4000');
 });

@@ -4,8 +4,8 @@ const SHA256 = require('crypto-js/sha256');
 const { MerkleTree } = require('merkletreejs');
 
 class RevocationsMerkleTree extends BasicMerkleTree {
-  constructor() {
-    super();
+  constructor(db) {
+    super(db, 'revocationsTree');
   }
 
   getProofForLeaf(revId) {

@@ -1,18 +1,28 @@
 // BasicMerkleTree.js
-const { MerkleTree } = require('merkletreejs');
+
 const SHA256 = require('crypto-js/sha256');
+const { MerkleTree }= require('merkletreejs');
+
 
 class BasicMerkleTree {
-  constructor() {
+  constructor(db, tableName) {
     this.leaves = [];
     this.tree = null;
+    this.db = db;
+    this.tableName = tableName;
   }
 
   addLeaf(value) {
+    const timestamp = Date.now();
     const hash = Buffer.from(SHA256(value.toString()).toString(), 'hex');
     this.leaves.push(hash);
     this.tree = new MerkleTree(this.leaves, SHA256);
-  }
+
+    // Save the new leaf and its timestamp to the SQLite database
+    this.db.run(`INSERT INTO ${this.tableName} VALUES (?, ?)`, [timestamp, hash.toString('hex')]);
+}
+
+  
   
 
   getRoot() {
@@ -40,6 +50,23 @@ class BasicMerkleTree {
   getLeaves() {
     return this.leaves.map(leaf => leaf.toString('hex'));
 }
+
+initFromDB() {
+  this.db.all(`SELECT leaf FROM ${this.tableName}`, (err, rows) => {
+      if (err) {
+          console.error(err);
+          return;
+      }
+
+      rows.forEach(row => {
+          let leaf = Buffer.from(row.leaf, 'hex');
+          this.leaves.push(leaf);
+      });
+
+      this.tree = new MerkleTree(this.leaves, SHA256);
+  });
+}
+
 }
 
 module.exports = BasicMerkleTree;
